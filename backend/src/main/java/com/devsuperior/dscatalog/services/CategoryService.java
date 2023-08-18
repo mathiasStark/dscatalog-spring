@@ -42,4 +42,13 @@ public class CategoryService {
 		return new CategoryDTO(category);
 	}
 
+
+	public CategoryDTO update(CategoryDTO dto, Long id) {
+		Optional<Category> obj = repository.findById(id);
+		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+		repository.save(entity);
+		CategoryDTO dtoUpdate = new CategoryDTO(entity);
+		return dtoUpdate;
+	}
+
 }

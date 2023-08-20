@@ -1,12 +1,16 @@
 package com.devsuperior.dscatalog.entities;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
@@ -23,6 +27,12 @@ public class Category implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
+	
+	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+	private Instant updateAt;
+	
+	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+	private Instant createAt;
 	
 	public Category() {}
 	
@@ -46,6 +56,26 @@ public class Category implements Serializable{
 	public Category setName(String name) {
 		this.name = name;
 		return null;
+	}
+	
+	
+
+	public Instant getUpdateAt() {
+		return updateAt;
+	}
+
+	public Instant getCreateAt() {
+		return createAt;
+	}
+
+	@PrePersist
+	public void preCreate() {
+		createAt = Instant.now();
+	}
+	
+	@PreUpdate
+	public void preUpdate() {
+		updateAt = Instant.now();
 	}
 
 	@Override

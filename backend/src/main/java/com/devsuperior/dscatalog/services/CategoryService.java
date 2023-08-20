@@ -5,6 +5,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +25,11 @@ public class CategoryService {
 	
 
 	@Transactional(readOnly = true)
-	public List<CategoryDTO> findAll() {
+	public Page<CategoryDTO> findAllPaged(PageRequest pageRequest) {
 		// TODO Auto-generated method stub
-		List<Category> list =  repository.findAll();
-		return  list.stream().map(category -> new CategoryDTO(category)).collect(Collectors.toList()); 
+		Page<Category> page = repository.findAll(pageRequest);
+		return page.map(category -> new CategoryDTO(category));
+//		return  list.stream().map(category -> new CategoryDTO(category)).collect(Collectors.toList()); 
 	}
 
 
@@ -45,10 +50,25 @@ public class CategoryService {
 
 	public CategoryDTO update(CategoryDTO dto, Long id) {
 		Optional<Category> obj = repository.findById(id);
+		//Category entity = repository.getOne(id);
 		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+		entity.setName(dto.getName());
 		repository.save(entity);
 		CategoryDTO dtoUpdate = new CategoryDTO(entity);
 		return dtoUpdate;
+	}
+
+
+	public void deleteById(Long id) {
+		
+		try {
+			repository.deleteById(id);
+		} catch(EmptyResultDataAccessException e) {
+			System.out.println(e.getMessage());
+		} catch(DataIntegrityViolationException e) {
+			System.out.println(e.getMessage());
+		}
+		
 	}
 
 }
